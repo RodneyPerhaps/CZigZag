@@ -46,7 +46,7 @@ def peak_valley_pivots(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double d
 
     Parameters
     ----------
-    X : This is your series.
+    X : This is your series. Should be numpy.ndarray of numpy.float64
     up_thresh : The minimum relative change necessary to define a peak.
     down_thesh : The minimum relative change necessary to define a valley.
 
@@ -54,12 +54,6 @@ def peak_valley_pivots(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double d
     -------
     an array with 0 indicating no pivot and -1 and 1 indicating valley and peak
     respectively
-
-    Using Pandas
-    ------------
-    For the most part, X may be a pandas series. However, the index must
-    either be [0,n) or a DateTimeIndex. Why? This function does X[t] to access
-    each element where t is in [0,n).
 
     The First and Last Elements
     ---------------------------
@@ -188,6 +182,7 @@ def peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarray
     close : This is series with closes prices.
     high : This is series with highs  prices.
     low : This is series with lows prices.
+      h, c and l should be numpy.ndarray of numpy.float64
     up_thresh : The minimum relative change necessary to define a peak.
     down_thesh : The minimum relative change necessary to define a valley.
 
@@ -195,12 +190,6 @@ def peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarray
     -------
     an array with 0 indicating no pivot and -1 and 1 indicating valley and peak
     respectively
-
-    Using Pandas
-    ------------
-    For the most part, close, high and low may be a pandas series. However, the index must
-    either be [0,n) or a DateTimeIndex. Why? This function does X[t] to access
-    each element where t is in [0,n).
 
     The First and Last Elements
     ---------------------------
