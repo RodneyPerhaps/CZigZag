@@ -1,30 +1,25 @@
 import numpy as np
+cimport numpy as np
 
-# Numba can be a pain to install. If you do not have numba, the functions 
-# will be left in their original, uncompiled form. 
-try:
-    from numba import jit
-except ImportError:
-    def jit(_):
-        def _f(f):
-            return f 
-        return _f
+cdef int VALLEY = -1
+cdef int PEAK = 1
 
-PEAK, VALLEY = 1, -1
+ctypedef np.float64_t FLOAT_t
+ctypedef np.int8_t INT_t
 
-
-@jit('i8(f8[:],f8,f8)')
-def _identify_initial_pivot(X, up_thresh, down_thresh):
+def _identify_initial_pivot(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double down_thresh):
     """Quickly identify the X[0] as a peak or valley."""
-    x_0 = X[0]
-    max_x = x_0
-    max_t = 0
-    min_x = x_0
-    min_t = 0
+    cdef double x_0 = X[0]
+    cdef double max_x = x_0
+    cdef double max_t = 0
+    cdef double min_x = x_0
+    cdef double min_t = 0
     up_thresh += 1
     down_thresh += 1
 
-    for t in range(1, len(X)):
+    cdef long t
+    cdef double x_t
+    for t in range(1, X.size):
         x_t = X[t]
 
         if x_t / min_x >= up_thresh:
@@ -41,12 +36,11 @@ def _identify_initial_pivot(X, up_thresh, down_thresh):
             min_x = x_t
             min_t = t
 
-    t_n = len(X)-1
+    cdef long t_n = X.size-1
     return VALLEY if x_0 < X[t_n] else PEAK
 
 
-@jit('i1[:](f8[:],f8,f8)')
-def peak_valley_pivots(X, up_thresh, down_thresh):
+def peak_valley_pivots(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double down_thresh):
     """
     Finds the peaks and valleys of a series.
 
@@ -78,10 +72,10 @@ def peak_valley_pivots(X, up_thresh, down_thresh):
     if down_thresh > 0:
         raise ValueError('The down_thresh must be negative.')
 
-    initial_pivot = _identify_initial_pivot(X, up_thresh, down_thresh)
+    cdef int initial_pivot = _identify_initial_pivot(X, up_thresh, down_thresh)
 
-    t_n = len(X)
-    pivots = np.zeros(t_n, dtype='i1')
+    cdef long t_n = X.size
+    cdef np.ndarray[INT_t, ndim=1] pivots = np.zeros(t_n, dtype='i1')
     pivots[0] = initial_pivot
 
     # Adding one to the relative change thresholds saves operations. Instead
@@ -91,10 +85,13 @@ def peak_valley_pivots(X, up_thresh, down_thresh):
     up_thresh += 1
     down_thresh += 1
 
-    trend = -initial_pivot
-    last_pivot_t = 0
-    last_pivot_x = X[0]
-    for t in range(1, len(X)):
+    cdef int trend = -initial_pivot
+    cdef long last_pivot_t = 0
+    cdef double last_pivot_x = X[0]
+    cdef long t
+    cdef double x
+    cdef double r
+    for t in range(1, X.size):
         x = X[t]
         r = x / last_pivot_x
 
@@ -125,14 +122,13 @@ def peak_valley_pivots(X, up_thresh, down_thresh):
     return pivots
 
 
-def compute_segment_returns(X, pivots):
+def compute_segment_returns(np.ndarray[FLOAT_t, ndim=1] X, np.ndarray[INT_t, ndim=1] pivots):
     """Return a numpy array of the pivot-to-pivot returns for each segment."""
     pivot_points = X[pivots != 0]
     return pivot_points[1:] / pivot_points[:-1] - 1.0
 
 
-@jit('f8(f8[:])')
-def max_drawdown(X):
+def max_drawdown(np.ndarray[FLOAT_t, ndim=1] X):
     """
     Return the absolute value of the maximum drawdown of sequence X.
 
@@ -140,9 +136,12 @@ def max_drawdown(X):
     ----
     If the sequence is strictly increasing, 0 is returned.
     """
-    mdd = 0
-    peak = X[0]
-    for x in X:
+    cdef double mdd = 0
+    cdef double peak = X[0]
+    cdef double dd
+    cdef long i
+    for i in range(0, X.size):
+        x = X[i]
         if x > peak: 
             peak = x
         dd = (peak - x) / peak
@@ -151,8 +150,7 @@ def max_drawdown(X):
     return mdd
 
 
-@jit('i1[:](i1[:])')
-def pivots_to_modes(pivots):
+def pivots_to_modes(np.ndarray[INT_t, ndim=1] pivots):
     """
     Translate pivots into trend modes.
 
@@ -165,10 +163,12 @@ def pivots_to_modes(pivots):
     A numpy array of trend modes. That is, between (VALLEY, PEAK] it is 1 and
     between (PEAK, VALLEY] it is -1.
     """
-    modes = np.zeros(len(pivots), dtype='i1')
+    cdef np.ndarray[INT_t, ndim=1] modes = np.zeros(pivots.size, dtype='i1')
     modes[0] = pivots[0]
-    mode = -modes[0]
-    for t in range(1, len(pivots)):
+    cdef long mode = -modes[0]
+    cdef long t
+    cdef long x
+    for t in range(1, pivots.size):
         x = pivots[t]
         if x != 0:
             modes[t] = mode
@@ -177,8 +177,8 @@ def pivots_to_modes(pivots):
             modes[t] = mode
     return modes
 
-@jit('i1[:](f8[:],f8[:],f8[:],f8,f8)')
-def peak_valley_pivots_candlestick(close, high, low, up_thresh, down_thresh):
+
+def peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarray[FLOAT_t, ndim=1] high, np.ndarray[FLOAT_t, ndim=1] low, double up_thresh, double down_thresh):
     """
     Finds the peaks and valleys of a series of HLC (open is not necessary).
     TR: This is modified peak_valley_pivots function in order to find peaks and valleys for OHLC.
@@ -213,10 +213,10 @@ def peak_valley_pivots_candlestick(close, high, low, up_thresh, down_thresh):
     if down_thresh > 0:
         raise ValueError('The down_thresh must be negative.')
 
-    initial_pivot = _identify_initial_pivot(close, up_thresh, down_thresh)
+    cdef int initial_pivot = _identify_initial_pivot(close, up_thresh, down_thresh)
 
-    t_n = len(close)
-    pivots = np.zeros(t_n, dtype='i1')
+    cdef long t_n = close.size
+    cdef np.ndarray[INT_t, ndim=1] pivots = np.zeros(t_n, dtype='i1')
     pivots[0] = initial_pivot
 
     # Adding one to the relative change thresholds saves operations. Instead
@@ -226,10 +226,13 @@ def peak_valley_pivots_candlestick(close, high, low, up_thresh, down_thresh):
     up_thresh += 1
     down_thresh += 1
 
-    trend = -initial_pivot
-    last_pivot_t = 0
-    last_pivot_x = close[0]
-    for t in range(1, len(close)):
+    cdef int trend = -initial_pivot
+    cdef long last_pivot_t = 0
+    cdef double last_pivot_x = close[0]
+    cdef long t
+    cdef double x
+    cdef double r
+    for t in range(1, close.size):
 
         if trend == -1:
             x = low[t]
