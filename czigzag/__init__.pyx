@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+cimport cython
 
 cdef int VALLEY = -1
 cdef int PEAK = 1
@@ -7,6 +8,9 @@ cdef int PEAK = 1
 ctypedef np.float64_t FLOAT_t
 ctypedef np.int8_t INT_t
 
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def _identify_initial_pivot(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double down_thresh):
     """Quickly identify the X[0] as a peak or valley."""
     cdef double x_0 = X[0]
@@ -40,6 +44,8 @@ def _identify_initial_pivot(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, dou
     return VALLEY if x_0 < X[t_n] else PEAK
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def peak_valley_pivots(np.ndarray[FLOAT_t, ndim=1] X, double up_thresh, double down_thresh):
     """
     Finds the peaks and valleys of a series.
@@ -122,6 +128,8 @@ def compute_segment_returns(np.ndarray[FLOAT_t, ndim=1] X, np.ndarray[INT_t, ndi
     return pivot_points[1:] / pivot_points[:-1] - 1.0
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def max_drawdown(np.ndarray[FLOAT_t, ndim=1] X):
     """
     Return the absolute value of the maximum drawdown of sequence X.
@@ -134,6 +142,7 @@ def max_drawdown(np.ndarray[FLOAT_t, ndim=1] X):
     cdef double peak = X[0]
     cdef double dd
     cdef long i
+    cdef double x
     for i in range(0, X.size):
         x = X[i]
         if x > peak: 
@@ -144,6 +153,8 @@ def max_drawdown(np.ndarray[FLOAT_t, ndim=1] X):
     return mdd
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def pivots_to_modes(np.ndarray[INT_t, ndim=1] pivots):
     """
     Translate pivots into trend modes.
@@ -172,6 +183,8 @@ def pivots_to_modes(np.ndarray[INT_t, ndim=1] pivots):
     return modes
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 def peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarray[FLOAT_t, ndim=1] high, np.ndarray[FLOAT_t, ndim=1] low, double up_thresh, double down_thresh):
     """
     Finds the peaks and valleys of a series of HLC (open is not necessary).
