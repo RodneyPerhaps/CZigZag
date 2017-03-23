@@ -6,8 +6,7 @@ from numpy.testing.utils import assert_array_equal, assert_array_almost_equal
 
 import czigzag as zigzag
 
-VALLEY = -1
-PEAK = 1
+from czigzag import VALLEY, PEAK
 
 
 class TestIdentifyInitialPivot(TestCase):
@@ -156,7 +155,7 @@ class TestMaxDrawdown(TestCase):
 
 class TestPivotsToModes(TestCase):
     def test_pivots_to_modes(self):
-        data = np.array([1, 0, 0, 0, -1, 0, 0, 1, -1, 0, 1], dtype=np.int8)
+        data = np.array([1, 0, 0, 0, -1, 0, 0, 1, -1, 0, 1])
         result = zigzag.pivots_to_modes(data)
         expected_result = np.array([1, -1, -1, -1, -1, 1, 1, 1, -1, 1, 1])
 

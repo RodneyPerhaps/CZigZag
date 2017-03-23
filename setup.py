@@ -5,11 +5,11 @@ from Cython.Distutils import build_ext
 
 README_FILE = os.path.join(os.path.dirname(__file__), 'README.rst')
 
-czigzag = Extension(name='czigzag.__init__', sources=['czigzag/__init__.pyx'])
+czigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'])
 
 setup(
     name='CZigZag',
-    version='0.1',
+    version='0.2',
     packages=['czigzag'],
     license='BSD-new license',
     description='Python package finding peaks and valleys of time series data.',
