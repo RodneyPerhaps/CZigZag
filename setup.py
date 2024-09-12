@@ -9,7 +9,7 @@ README_FILE = os.path.join(os.path.dirname(__file__), 'README.rst')
 czigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'], include_dirs=[numpy.get_include()])
 
 setup(
-    name='ZigZag',
+    name='CZigZag',
     version='0.2',
     packages=['czigzag'],
     license='BSD-new license',
