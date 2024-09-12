@@ -6,12 +6,12 @@ import numpy
 
 README_FILE = os.path.join(os.path.dirname(__file__), 'README.rst')
 
-czigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'], include_dirs=[numpy.get_include()])
+zigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'], include_dirs=[numpy.get_include()])
 
 setup(
-    name='CZigZag',
+    name='ZigZag',
     version='0.2',
-    packages=['czigzag'],
+    packages=['zigzag'],
     license='BSD-new license',
     description='Python package finding peaks and valleys of time series data.',
     long_description=open(README_FILE).read(),
