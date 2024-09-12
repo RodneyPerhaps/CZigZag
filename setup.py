@@ -23,5 +23,5 @@ setup(
     ],
     data_files=['README.rst'],
     cmdclass={'build_ext':build_ext},
-    ext_modules = [czigzag]
+    ext_modules = [zigzag]
 )
