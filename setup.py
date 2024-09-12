@@ -2,10 +2,11 @@ import os
 from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Distutils import build_ext
+import numpy
 
 README_FILE = os.path.join(os.path.dirname(__file__), 'README.rst')
 
-czigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'])
+czigzag = Extension(name='czigzag.cythonfcns', sources=['czigzag/cythonfcns.pyx'], include_dirs=[numpy.get_include()])
 
 setup(
     name='CZigZag',
