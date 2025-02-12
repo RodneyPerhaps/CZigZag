@@ -162,7 +162,7 @@ def _peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarra
             if r >= up_thresh:
                 pivots[last_pivot_t] = trend
                 trend = 1
-                last_pivot_x = x
+                last_pivot_x = high[t]
                 last_pivot_t = t
             elif x < last_pivot_x:
                 last_pivot_x = x
@@ -173,7 +173,7 @@ def _peak_valley_pivots_candlestick(np.ndarray[FLOAT_t, ndim=1] close, np.ndarra
             if r <= down_thresh:
                 pivots[last_pivot_t] = trend
                 trend = -1
-                last_pivot_x = x
+                last_pivot_x = low[t]
                 last_pivot_t = t
             elif x > last_pivot_x:
                 last_pivot_x = x
