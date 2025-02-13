@@ -9,8 +9,9 @@ For maximum speed, CZigzag is written in Cython while ZigZag can optionally use 
 - peak_valley_pivots is 50x faster
 - pivots_to_modes is 900x faster
 - max_drawdown is 140x faster
+- peak_valley_pivots_candlestick is 100x faster
 
 Installation
 ------------
 
-pip install git+https://github.com/jewicht/ZigZag.git
+pip install git+https://github.com/RodneyPerhaps/CZigZag
